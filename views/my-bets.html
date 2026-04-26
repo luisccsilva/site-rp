@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RP Bets - As Minhas Apostas</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <h1>As Minhas Apostas</h1>
+        <div class="topbar-actions">
+          <a class="btn-link" href="/dashboard">Voltar ao Dashboard</a>
+          <button id="logout-btn" type="button">Logout</button>
+        </div>
+      </header>
+
+      <section class="card">
+        <p class="disclaimer">Historico ficticio para roleplay. Sem dinheiro real.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Jogo</th>
+              <th>Odd</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="bets-body"></tbody>
+        </table>
+        <p id="message" class="message"></p>
+      </section>
+    </main>
+
+    <script src="/public/my-bets.js"></script>
+  </body>
+</html>

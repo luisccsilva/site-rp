@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RP Bets - Login</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="page auth-page">
+      <section class="card">
+        <h1>RP Bets</h1>
+        <p class="disclaimer">Plataforma ficticia para roleplay. Sem dinheiro real.</p>
+        <h2>Login</h2>
+        <form id="login-form">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required minlength="3" maxlength="30" />
+
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required minlength="6" />
+
+          <button type="submit">Entrar</button>
+        </form>
+        <p id="message" class="message"></p>
+        <p class="muted">Nao tens conta? <a href="/register">Criar conta</a></p>
+      </section>
+    </main>
+    <script src="/public/auth.js"></script>
+  </body>
+</html>
