@@ -24,7 +24,14 @@ router.post('/admin/login', async (req, res) => {
     username: adminConfig.username
   };
 
-  return res.json({ message: 'Login de admin efetuado.' });
+  return req.session.save((error) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Erro ao guardar sessao de admin.' });
+    }
+
+    return res.json({ message: 'Login de admin efetuado.' });
+  });
 });
 
 router.get('/admin/session', (req, res) => {

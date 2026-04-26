@@ -11,7 +11,9 @@ const setMessage = (element, text, isError = false) => {
 };
 
 const ensureAdminSession = async () => {
-  const response = await fetch('/admin/session');
+  const response = await fetch('/admin/session', {
+    credentials: 'same-origin'
+  });
 
   if (response.status === 401) {
     window.location.href = '/login';
@@ -22,7 +24,9 @@ const ensureAdminSession = async () => {
 };
 
 const loadGames = async () => {
-  const response = await fetch('/admin/games');
+  const response = await fetch('/admin/games', {
+    credentials: 'same-origin'
+  });
 
   if (response.status === 401) {
     window.location.href = '/login';
@@ -53,7 +57,9 @@ const loadGames = async () => {
 };
 
 const loadBets = async () => {
-  const response = await fetch('/admin/bets');
+  const response = await fetch('/admin/bets', {
+    credentials: 'same-origin'
+  });
 
   if (response.status === 401) {
     window.location.href = '/login';
@@ -95,6 +101,7 @@ gameForm.addEventListener('submit', async (event) => {
   try {
     const response = await fetch('/admin/games', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
@@ -122,7 +129,8 @@ gamesListEl.addEventListener('click', async (event) => {
 
   try {
     const response = await fetch(`/admin/games/delete/${trigger.dataset.gameId}`, {
-      method: 'POST'
+      method: 'POST',
+      credentials: 'same-origin'
     });
 
     const data = await response.json();

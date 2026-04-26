@@ -68,6 +68,7 @@ if (adminForm) {
     try {
       const response = await fetch('/admin/login', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
