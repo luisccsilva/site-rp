@@ -6,6 +6,10 @@ const requireAuth = (req, res, next) => {
 };
 
 const requireGuestPage = (req, res, next) => {
+  if (req.session.admin && req.session.admin.authenticated) {
+    return res.redirect('/admin');
+  }
+
   if (req.session.user) {
     return res.redirect('/dashboard');
   }

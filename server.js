@@ -7,6 +7,7 @@ const { initDatabase } = require('./db');
 const pageRoutes = require('./routes/pageRoutes');
 const authRoutes = require('./routes/authRoutes');
 const betsRoutes = require('./routes/betsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +45,7 @@ app.get('/', (req, res) => {
 app.use(pageRoutes);
 app.use(authRoutes);
 app.use(betsRoutes);
+app.use(adminRoutes);
 
 app.use((req, res) => {
   res.status(404).send('Pagina nao encontrada');

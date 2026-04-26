@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RP Bets - Admin</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div>
+          <h1>Painel Admin</h1>
+          <p class="disclaimer">Gestao interna do roleplay. Sem dinheiro real.</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="logout-btn" type="button">Logout</button>
+        </div>
+      </header>
+
+      <section class="card admin-layout">
+        <div>
+          <h2>Criar jogo</h2>
+          <form id="admin-game-form">
+            <label for="name">Nome do jogo</label>
+            <input id="name" name="name" type="text" required maxlength="120" />
+
+            <label for="odd">Odd</label>
+            <input id="odd" name="odd" type="number" min="1.01" step="0.01" required />
+
+            <button type="submit">Criar jogo</button>
+          </form>
+          <p id="game-message" class="message"></p>
+        </div>
+
+        <div>
+          <h2>Jogos existentes</h2>
+          <div id="admin-games-list" class="games-grid"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Apostas dos utilizadores</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Jogo</th>
+              <th>Odd</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody id="admin-bets-body"></tbody>
+        </table>
+        <p id="bets-message" class="message"></p>
+      </section>
+    </main>
+
+    <script src="/public/admin.js"></script>
+  </body>
+</html>

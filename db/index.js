@@ -11,6 +11,28 @@ const pool = new Pool({
 
 const query = (text, params = []) => pool.query(text, params);
 
+const defaultGames = [
+  ['Lobos FC vs Trovada United', 1.85],
+  ['Porto Alto RP vs Bairro Oeste RP', 2.35],
+  ['Guarda Sul RP vs Vila Nova RP', 1.6],
+  ['Mercado Central RP vs Linha Norte RP', 3.1]
+];
+
+const seedGamesIfEmpty = async () => {
+  const existingGames = await query('SELECT COUNT(*)::int AS count FROM games');
+
+  if (existingGames.rows[0].count > 0) {
+    return;
+  }
+
+  // Semear jogos iniciais para que o dashboard tenha sempre conteudo util apos o primeiro arranque.
+  await Promise.all(
+    defaultGames.map(([name, odd]) =>
+      query('INSERT INTO games (name, odd) VALUES ($1, $2)', [name, odd])
+    )
+  );
+};
+
 const initDatabase = async () => {
   await query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -29,6 +51,16 @@ const initDatabase = async () => {
       amount NUMERIC(10,2) NOT NULL CHECK (amount > 0)
     );
   `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS games (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(120) NOT NULL,
+      odd NUMERIC(6,2) NOT NULL CHECK (odd > 1)
+    );
+  `);
+
+  await seedGamesIfEmpty();
 };
 
 module.exports = {

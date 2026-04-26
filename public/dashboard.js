@@ -13,8 +13,8 @@ const showMessage = (text, isError = false) => {
 };
 
 const updateOdd = () => {
-  const selected = games.find((game) => game.game === gameSelect.value);
-  oddInput.value = selected ? selected.odd.toFixed(2) : '';
+  const selected = games.find((game) => game.name === gameSelect.value);
+  oddInput.value = selected ? Number(selected.odd).toFixed(2) : '';
 };
 
 const loadGames = async () => {
@@ -34,14 +34,20 @@ const loadGames = async () => {
   games.forEach((item) => {
     const card = document.createElement('article');
     card.className = 'game-item';
-    card.innerHTML = `<strong>${item.game}</strong><p>Odd: ${item.odd.toFixed(2)}</p>`;
+    card.innerHTML = `<strong>${item.name}</strong><p>Odd: ${Number(item.odd).toFixed(2)}</p>`;
     gamesList.appendChild(card);
 
     const option = document.createElement('option');
-    option.value = item.game;
-    option.textContent = `${item.game} (odd ${item.odd.toFixed(2)})`;
+    option.value = item.name;
+    option.textContent = `${item.name} (odd ${Number(item.odd).toFixed(2)})`;
     gameSelect.appendChild(option);
   });
+
+  if (!games.length) {
+    showMessage('Nao existem jogos disponiveis neste momento.', true);
+    oddInput.value = '';
+    return;
+  }
 
   updateOdd();
 };

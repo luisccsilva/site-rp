@@ -38,6 +38,8 @@ Cria um ficheiro `.env` com base no `.env.example`:
 - `DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DBNAME`
 - `SESSION_SECRET=uma_chave_muito_forte`
 - `NODE_ENV=development`
+- `ADMIN_USERNAME=galerinha`
+- `ADMIN_PASSWORD=arrozfrito`
 
 ## Como correr localmente
 
@@ -52,12 +54,22 @@ Abre no browser:
 
 ## Base de dados
 
-As tabelas sao criadas automaticamente no arranque (`users` e `bets`).
+As tabelas sao criadas automaticamente no arranque (`users`, `bets` e `games`).
 
 Schema equivalente em `db/schema.sql`:
 
 - `users (id, username, password)`
 - `bets (id, user_id, game, odd, amount)`
+- `games (id, name, odd)`
+
+## Admin
+
+- Painel em `/admin`
+- Login admin separado do sistema de utilizadores normal
+- Credenciais por omissao:
+- `username: galerinha`
+- `password: arrozfrito`
+- O codigo ja aceita trocar isto no futuro via `ADMIN_USERNAME` e `ADMIN_PASSWORD`
 
 ## Deploy no Render
 

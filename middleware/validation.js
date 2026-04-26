@@ -9,8 +9,17 @@ const isValidAmount = (amount) => {
   return Number.isFinite(parsed) && parsed > 0 && parsed <= 100000;
 };
 
+const isValidGameName = (name) => typeof name === 'string' && name.trim().length >= 3 && name.trim().length <= 120;
+
+const isValidOdd = (odd) => {
+  const parsed = Number(odd);
+  return Number.isFinite(parsed) && parsed > 1 && parsed <= 1000;
+};
+
 module.exports = {
   isValidUsername,
   isValidPassword,
-  isValidAmount
+  isValidAmount,
+  isValidGameName,
+  isValidOdd
 };

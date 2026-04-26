@@ -5,15 +5,14 @@ const { isValidAmount } = require('../middleware/validation');
 
 const router = express.Router();
 
-const games = [
-  { game: 'Lobos FC vs Trovada United', odd: 1.85 },
-  { game: 'Porto Alto RP vs Bairro Oeste RP', odd: 2.35 },
-  { game: 'Guarda Sul RP vs Vila Nova RP', odd: 1.6 },
-  { game: 'Mercado Central RP vs Linha Norte RP', odd: 3.1 }
-];
-
-router.get('/api/games', requireAuth, (req, res) => {
-  res.json({ games });
+router.get('/api/games', requireAuth, async (req, res) => {
+  try {
+    const result = await query('SELECT id, name, odd FROM games ORDER BY id DESC');
+    return res.json({ games: result.rows });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erro ao carregar jogos.' });
+  }
 });
 
 router.post('/api/bets', requireAuth, async (req, res) => {
@@ -27,21 +26,26 @@ router.post('/api/bets', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Valor de aposta invalido.' });
   }
 
-  const selectedGame = games.find((g) => g.game === game);
-  if (!selectedGame) {
-    return res.status(400).json({ error: 'Jogo nao suportado.' });
-  }
-
-  const normalizedOdd = Number(odd);
-  if (Number.isNaN(normalizedOdd) || normalizedOdd !== selectedGame.odd) {
-    return res.status(400).json({ error: 'Odd invalida para este jogo.' });
-  }
-
   try {
+    const selectedGameResult = await query('SELECT id, name, odd FROM games WHERE name = $1 LIMIT 1', [
+      game.trim()
+    ]);
+
+    if (!selectedGameResult.rows.length) {
+      return res.status(400).json({ error: 'Jogo nao suportado.' });
+    }
+
+    const selectedGame = selectedGameResult.rows[0];
+    const normalizedOdd = Number(odd);
+
+    if (Number.isNaN(normalizedOdd) || normalizedOdd !== Number(selectedGame.odd)) {
+      return res.status(400).json({ error: 'Odd invalida para este jogo.' });
+    }
+
     await query('INSERT INTO bets (user_id, game, odd, amount) VALUES ($1, $2, $3, $4)', [
       req.session.user.id,
-      selectedGame.game,
-      selectedGame.odd,
+      selectedGame.name,
+      Number(selectedGame.odd),
       Number(amount)
     ]);
 

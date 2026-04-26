@@ -23,6 +23,34 @@
         </form>
         <p id="message" class="message"></p>
         <p class="muted">Nao tens conta? <a href="/register">Criar conta</a></p>
+
+        <hr class="divider" />
+
+        <section class="admin-login">
+          <h2>Login de Admin</h2>
+          <form id="admin-login-form">
+            <label for="admin-username">Username admin</label>
+            <input
+              id="admin-username"
+              name="username"
+              type="text"
+              required
+              autocomplete="username"
+            />
+
+            <label for="admin-password">Password admin</label>
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              required
+              autocomplete="current-password"
+            />
+
+            <button type="submit">Entrar como admin</button>
+          </form>
+          <p id="admin-message" class="message"></p>
+        </section>
       </section>
     </main>
     <script src="/public/auth.js"></script>
