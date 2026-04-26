@@ -13,7 +13,8 @@ Website de apostas ficticias para roleplay, feito com Node.js + Express + Postgr
 - Validacao de inputs no backend
 - Lista de jogos mockados com odds
 - Criacao de apostas e armazenamento no PostgreSQL
-- Historico de apostas do utilizador
+- Historico de apostas do utilizador com estado `pending`, `completed` ou `cancelled`
+- Gestao admin para concluir ou cancelar apostas pendentes
 
 ## Estrutura
 
@@ -59,7 +60,7 @@ As tabelas sao criadas automaticamente no arranque (`users`, `bets` e `games`).
 Schema equivalente em `db/schema.sql`:
 
 - `users (id, username, password)`
-- `bets (id, user_id, game, odd, amount)`
+- `bets (id, user_id, game, odd, status)`
 - `games (id, name, odd)`
 
 ## Admin

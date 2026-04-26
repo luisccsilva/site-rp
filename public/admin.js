@@ -3,11 +3,23 @@ const gameMessageEl = document.getElementById('game-message');
 const betsMessageEl = document.getElementById('bets-message');
 const gamesListEl = document.getElementById('admin-games-list');
 const betsBodyEl = document.getElementById('admin-bets-body');
+const betsFilterForm = document.getElementById('bets-filter-form');
+const resetFiltersBtn = document.getElementById('reset-filters-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
 const setMessage = (element, text, isError = false) => {
   element.textContent = text;
   element.style.color = isError ? '#b51f1f' : '#166534';
+};
+
+const getStatusLabel = (status) => {
+  const labels = {
+    pending: 'Pendente',
+    completed: 'Completa',
+    cancelled: 'Cancelada'
+  };
+
+  return labels[status] || status;
 };
 
 const ensureAdminSession = async () => {
@@ -56,8 +68,26 @@ const loadGames = async () => {
   });
 };
 
+const buildBetsQuery = () => {
+  const formData = new FormData(betsFilterForm);
+  const params = new URLSearchParams();
+  const status = String(formData.get('status') || '').trim();
+  const username = String(formData.get('username') || '').trim();
+
+  if (status) {
+    params.set('status', status);
+  }
+
+  if (username) {
+    params.set('username', username);
+  }
+
+  const query = params.toString();
+  return query ? `?${query}` : '';
+};
+
 const loadBets = async () => {
-  const response = await fetch('/admin/bets', {
+  const response = await fetch(`/admin/bets${buildBetsQuery()}`, {
     credentials: 'same-origin'
   });
 
@@ -67,11 +97,16 @@ const loadBets = async () => {
   }
 
   const data = await response.json();
+
+  if (!response.ok) {
+    return setMessage(betsMessageEl, data.error || 'Nao foi possivel carregar apostas.', true);
+  }
+
   const bets = data.bets || [];
   betsBodyEl.innerHTML = '';
 
   if (!bets.length) {
-    setMessage(betsMessageEl, 'Ainda nao existem apostas de utilizadores.');
+    setMessage(betsMessageEl, 'Nenhuma aposta encontrada com os filtros atuais.');
     return;
   }
 
@@ -79,11 +114,20 @@ const loadBets = async () => {
 
   bets.forEach((bet) => {
     const row = document.createElement('tr');
+    const actions =
+      bet.status === 'pending'
+        ? `
+          <button type="button" data-bet-id="${bet.id}" data-status="completed" class="success-button">Completar</button>
+          <button type="button" data-bet-id="${bet.id}" data-status="cancelled" class="danger-button">Cancelar</button>
+        `
+        : '<span class="muted">Sem acoes</span>';
+
     row.innerHTML = `
       <td>${bet.username}</td>
       <td>${bet.game}</td>
       <td>${Number(bet.odd).toFixed(2)}</td>
-      <td>${Number(bet.amount).toFixed(2)}</td>
+      <td><span class="status-badge status-${bet.status}">${getStatusLabel(bet.status)}</span></td>
+      <td class="actions-cell">${actions}</td>
     `;
     betsBodyEl.appendChild(row);
   });
@@ -143,6 +187,48 @@ gamesListEl.addEventListener('click', async (event) => {
     await loadGames();
   } catch (error) {
     setMessage(gameMessageEl, 'Erro de rede ao apagar jogo.', true);
+  }
+});
+
+betsFilterForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  await loadBets();
+});
+
+resetFiltersBtn.addEventListener('click', async () => {
+  betsFilterForm.reset();
+  await loadBets();
+});
+
+betsBodyEl.addEventListener('click', async (event) => {
+  const actionButton = event.target.closest('[data-bet-id][data-status]');
+
+  if (!actionButton) {
+    return;
+  }
+
+  const payload = {
+    status: actionButton.dataset.status
+  };
+
+  try {
+    const response = await fetch(`/admin/bets/${actionButton.dataset.betId}/status`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return setMessage(betsMessageEl, data.error || 'Nao foi possivel atualizar a aposta.', true);
+    }
+
+    setMessage(betsMessageEl, data.message || 'Estado atualizado com sucesso.');
+    await loadBets();
+  } catch (error) {
+    setMessage(betsMessageEl, 'Erro de rede ao atualizar a aposta.', true);
   }
 });
 

@@ -57,8 +57,7 @@ betForm.addEventListener('submit', async (event) => {
 
   const payload = {
     game: gameSelect.value,
-    odd: Number(oddInput.value),
-    amount: Number(document.getElementById('amount').value)
+    odd: Number(oddInput.value)
   };
 
   try {

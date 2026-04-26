@@ -7,6 +7,16 @@ const showMessage = (text, isError = false) => {
   messageEl.style.color = isError ? '#b51f1f' : '#166534';
 };
 
+const getStatusLabel = (status) => {
+  const labels = {
+    pending: 'Pendente',
+    completed: 'Completa',
+    cancelled: 'Cancelada'
+  };
+
+  return labels[status] || status;
+};
+
 const loadBets = async () => {
   const response = await fetch('/api/my-bets');
 
@@ -31,7 +41,7 @@ const loadBets = async () => {
       <td>${bet.id}</td>
       <td>${bet.game}</td>
       <td>${Number(bet.odd).toFixed(2)}</td>
-      <td>${Number(bet.amount).toFixed(2)}</td>
+      <td><span class="status-badge status-${bet.status}">${getStatusLabel(bet.status)}</span></td>
     `;
     betsBody.appendChild(row);
   });

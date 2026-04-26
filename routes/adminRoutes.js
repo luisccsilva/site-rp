@@ -6,6 +6,7 @@ const { isValidGameName, isValidOdd } = require('../middleware/validation');
 
 const router = express.Router();
 const viewsPath = path.join(__dirname, '..', 'views');
+const validStatuses = new Set(['pending', 'completed', 'cancelled']);
 
 router.get('/admin', requireAdminPage, (req, res) => {
   res.sendFile(path.join(viewsPath, 'admin.html'));
@@ -97,19 +98,71 @@ router.post('/admin/games/delete/:id', requireAdmin, async (req, res) => {
 });
 
 router.get('/admin/bets', requireAdmin, async (req, res) => {
+  const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim().toLowerCase() : '';
+  const usernameFilter =
+    typeof req.query.username === 'string' ? req.query.username.trim().toLowerCase() : '';
+
+  if (statusFilter && !validStatuses.has(statusFilter)) {
+    return res.status(400).json({ error: 'Filtro de estado invalido.' });
+  }
+
   try {
+    const conditions = [];
+    const values = [];
+
+    if (statusFilter) {
+      values.push(statusFilter);
+      conditions.push(`bets.status = $${values.length}`);
+    }
+
+    if (usernameFilter) {
+      values.push(`%${usernameFilter}%`);
+      conditions.push(`LOWER(users.username) LIKE $${values.length}`);
+    }
+
+    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
     // O JOIN expande apenas o username do utilizador, sem expor qualquer password.
     const result = await query(
-      `SELECT bets.id, users.username, bets.game, bets.odd, bets.amount
+      `SELECT bets.id, users.username, bets.game, bets.odd, bets.status
        FROM bets
        INNER JOIN users ON users.id = bets.user_id
+       ${whereClause}
        ORDER BY bets.id DESC`
+      ,
+      values
     );
 
     return res.json({ bets: result.rows });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erro ao carregar apostas dos utilizadores.' });
+  }
+});
+
+router.post('/admin/bets/:id/status', requireAdmin, async (req, res) => {
+  const betId = Number(req.params.id);
+  const status = typeof req.body.status === 'string' ? req.body.status.trim().toLowerCase() : '';
+
+  if (!Number.isInteger(betId) || betId <= 0) {
+    return res.status(400).json({ error: 'ID de aposta invalido.' });
+  }
+
+  if (!validStatuses.has(status) || status === 'pending') {
+    return res.status(400).json({ error: 'Estado invalido para atualizacao.' });
+  }
+
+  try {
+    const result = await query('UPDATE bets SET status = $1 WHERE id = $2', [status, betId]);
+
+    if (!result.rowCount) {
+      return res.status(404).json({ error: 'Aposta nao encontrada.' });
+    }
+
+    return res.json({ message: 'Estado da aposta atualizado com sucesso.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Erro ao atualizar estado da aposta.' });
   }
 });
 

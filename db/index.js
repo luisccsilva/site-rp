@@ -48,8 +48,18 @@ const initDatabase = async () => {
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       game VARCHAR(120) NOT NULL,
       odd NUMERIC(6,2) NOT NULL,
-      amount NUMERIC(10,2) NOT NULL CHECK (amount > 0)
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
     );
+  `);
+
+  await query(`
+    ALTER TABLE bets
+    ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'pending';
+  `);
+
+  await query(`
+    ALTER TABLE bets
+    DROP COLUMN IF EXISTS amount;
   `);
 
   await query(`

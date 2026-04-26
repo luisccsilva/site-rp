@@ -1,7 +1,6 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
-const { isValidAmount } = require('../middleware/validation');
 
 const router = express.Router();
 
@@ -16,14 +15,10 @@ router.get('/api/games', requireAuth, async (req, res) => {
 });
 
 router.post('/api/bets', requireAuth, async (req, res) => {
-  const { game, odd, amount } = req.body;
+  const { game, odd } = req.body;
 
   if (typeof game !== 'string' || !game.trim()) {
     return res.status(400).json({ error: 'Jogo invalido.' });
-  }
-
-  if (!isValidAmount(amount)) {
-    return res.status(400).json({ error: 'Valor de aposta invalido.' });
   }
 
   try {
@@ -42,14 +37,14 @@ router.post('/api/bets', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Odd invalida para este jogo.' });
     }
 
-    await query('INSERT INTO bets (user_id, game, odd, amount) VALUES ($1, $2, $3, $4)', [
+    await query('INSERT INTO bets (user_id, game, odd, status) VALUES ($1, $2, $3, $4)', [
       req.session.user.id,
       selectedGame.name,
       Number(selectedGame.odd),
-      Number(amount)
+      'pending'
     ]);
 
-    return res.status(201).json({ message: 'Aposta registada com sucesso.' });
+    return res.status(201).json({ message: 'Aposta registada com sucesso e ficou pendente.' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Erro ao guardar aposta.' });
@@ -59,7 +54,7 @@ router.post('/api/bets', requireAuth, async (req, res) => {
 router.get('/api/my-bets', requireAuth, async (req, res) => {
   try {
     const result = await query(
-      'SELECT id, game, odd, amount FROM bets WHERE user_id = $1 ORDER BY id DESC',
+      'SELECT id, game, odd, status FROM bets WHERE user_id = $1 ORDER BY id DESC',
       [req.session.user.id]
     );
     return res.json({ bets: result.rows });

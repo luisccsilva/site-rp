@@ -41,13 +41,36 @@
 
       <section class="card">
         <h2>Apostas dos utilizadores</h2>
+        <form id="bets-filter-form" class="filter-grid">
+          <div>
+            <label for="filter-status">Estado</label>
+            <select id="filter-status" name="status">
+              <option value="">Todos</option>
+              <option value="pending">Pendente</option>
+              <option value="completed">Completa</option>
+              <option value="cancelled">Cancelada</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="filter-username">Nome da pessoa</label>
+            <input id="filter-username" name="username" type="text" placeholder="Filtrar username" />
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit">Filtrar</button>
+            <button id="reset-filters-btn" type="button" class="secondary-button">Limpar</button>
+          </div>
+        </form>
+
         <table>
           <thead>
             <tr>
               <th>Username</th>
               <th>Jogo</th>
               <th>Odd</th>
-              <th>Valor</th>
+              <th>Estado</th>
+              <th>Acoes</th>
             </tr>
           </thead>
           <tbody id="admin-bets-body"></tbody>
